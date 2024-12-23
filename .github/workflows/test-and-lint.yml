@@ -48,7 +48,7 @@ jobs:
           docker compose run --rm terraform -chdir=deploy/ validate
           docker compose run --rm terraform -chdir=deploy/ fmt -check
   docker:
-    name: Docker
+    name: Docker Build Images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
