@@ -29,7 +29,7 @@ jobs:
     
   terraform:
     name: Terraform
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -47,3 +47,21 @@ jobs:
           docker compose run --rm terraform -chdir=setup/ fmt -check
           docker compose run --rm terraform -chdir=deploy/ validate
           docker compose run --rm terraform -chdir=deploy/ fmt -check
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set vars
+        run: |
+          if [[ $GITHUB_REF == 'refs/heads/prod' ]]; then
+            echo "prod" > .workspace
+          else
+          echo "staging" > .workspace
+          fi
+      - name: Build Docker images        
+        run: |         
+          docker build --compress -t ${{ vars.ECR_REPO_APP }}:$GITHUB_SHA .          
+          docker build --compress -t ${{ vars.ECR_REPO_PROXY }}:$GITHUB_SHA proxy/
+          
